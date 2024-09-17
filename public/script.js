@@ -32,11 +32,16 @@ async function scrapeImages(urls, downloadPath) {
             img.src = imageUrl;
             img.style.maxWidth = '200px';
             img.style.maxHeight = '200px';
+
+
             img.alt = 'Image';
 
             const div = document.createElement('div');
             div.style.width = '90%';
             div.style.backgroundColor = 'darkgray';
+            div.style.marginTop = '5px';
+            div.style.borderRadius = '10px';
+            div.style.margtintop = '5px';
             div.appendChild(img);
             div.appendChild(link);
 
