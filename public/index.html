@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Image Scraper</title>
 </head>
+
 <body>
-    <h1>Image Scraper</h1>
-    <form id="scraper-form">
-        <label for="urls">Website URLs (one per line):</label>
-        <textarea id="urls" name="urls" rows="10" cols="50" placeholder="Enter URLs, one per line"></textarea>
-        <label for="downloadPath">Download Path:</label>
-        <input type="text" id="downloadPath" name="downloadPath" required placeholder="e.g., downloads/images">
-        <button type="submit">Scrape Images</button>
-    </form>
+    <div class="vertical card inter">
+        <h1>Scrapper de Imagenes -- Versión 0.1.1</h1>
+        <form id="scraper-form" class="vertical">
+            <label for="urls">Website URLs (one per line):</label>
+            <textarea class="input" id="urls" name="urls" rows="10" cols="50" required
+                placeholder="Enter URLs, one per line"></textarea>
+            <label for="downloadPath">Download Path:</label>
+            <input class="input" type="text" id="downloadPath" name="downloadPath" required
+                placeholder="e.g., downloads/images">
+            <button type="submit">Scrape Images</button>
+        </form>
+    </div>
     <div id="results"></div>
     <script src="script.js"></script>
 </body>
+
 </html>

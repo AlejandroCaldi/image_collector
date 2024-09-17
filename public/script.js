@@ -30,11 +30,13 @@ async function scrapeImages(urls, downloadPath) {
 
             const img = document.createElement('img');
             img.src = imageUrl;
-            img.style.maxWidth = '100px';
-            img.style.maxHeight = '100px';
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
             img.alt = 'Image';
 
             const div = document.createElement('div');
+            div.style.width = '90%';
+            div.style.backgroundColor = 'darkgray';
             div.appendChild(img);
             div.appendChild(link);
 
