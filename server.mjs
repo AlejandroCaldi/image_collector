@@ -9,6 +9,9 @@ import axios from 'axios';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+console.log('__filename:', __filename);
+console.log('__dirname:', __dirname);
+
 const app = express();
 const port = 3000;
 
@@ -35,21 +38,24 @@ function ensureJpgExtension(filename) {
     return filename;
 }
 
-
 // Function to sanitize filenames for the filesystem
 function sanitizeFilename(filename) {
     return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
 
 app.post('/scrape', async (req, res) => {
-    const { urls, downloadPath } = req.body;
+    const { urls } = req.body;
 
     if (!urls || !urls.length) {
         return res.status(400).json({ error: 'At least one URL is required' });
     }
 
-    if (!downloadPath) {
-        return res.status(400).json({ error: 'Download path is required' });
+    const downloadDir = path.join(__dirname, 'fotos');
+
+    console.log('downloadDir:', downloadDir);
+
+    if (!fs.existsSync(downloadDir)) {
+        fs.mkdirSync(downloadDir, { recursive: true });
     }
 
     const allImageUrls = [];
@@ -64,6 +70,8 @@ app.post('/scrape', async (req, res) => {
 
             $('img').each((index, element) => {
                 const src = $(element).attr('src');
+                console.log('Image src:', src); // Add this line to debug
+            
                 if (src) {
                     const fullUrl = new URL(src, url).href;
                     imageUrls.push(fullUrl);
@@ -71,12 +79,6 @@ app.post('/scrape', async (req, res) => {
             });
 
             allImageUrls.push(...imageUrls);
-        }
-
-        // Create the download directory if it doesn't exist
-        const downloadDir = path.join(__dirname, downloadPath);
-        if (!fs.existsSync(downloadDir)) {
-            fs.mkdirSync(downloadDir, { recursive: true });
         }
 
         // Download each image

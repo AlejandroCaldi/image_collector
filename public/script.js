@@ -1,53 +1,48 @@
 document.getElementById('scraper-form').addEventListener('submit', function(event) {
     event.preventDefault();
     const urls = document.getElementById('urls').value.split('\n').map(url => url.trim()).filter(url => url);
-    const downloadPath = document.getElementById('downloadPath').value;
-    scrapeImages(urls, downloadPath);
+    scrapeImages(urls);
 });
 
-async function scrapeImages(urls, downloadPath) {
+async function scrapeImages(urls) {
+    const cubito = document.getElementById('cubito');
+    cubito.style.visibility = 'visible';
     try {
         const response = await fetch('/scrape', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ urls, downloadPath })
+            body: JSON.stringify({ urls })
         });
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const result = await response.json();
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'images.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        // Hide the spinner after download
+        cubito.style.visibility = 'hidden';
+
+        // Show success message
         const results = document.getElementById('results');
-        results.innerHTML = '';
+        results.innerHTML = '<p>Images downloaded successfully. Check your downloads folder.</p>';
 
-        result.imageUrls.forEach(imageUrl => {
-            const link = document.createElement('a');
-            link.href = imageUrl;
-            link.download = '';
-            link.textContent = `Downloaded ${imageUrl}`;
-            link.target = '_blank';
-
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.style.maxWidth = '200px';
-            img.style.maxHeight = '200px';
-
-
-            img.alt = 'Image';
-
-            const div = document.createElement('div');
-            div.style.width = '90%';
-            div.style.backgroundColor = 'darkgray';
-            div.style.marginTop = '5px';
-            div.style.borderRadius = '10px';
-            div.style.margtintop = '5px';
-            div.appendChild(img);
-            div.appendChild(link);
-
-            results.appendChild(div);
-        });
     } catch (error) {
         console.error('Error:', error);
+
+        // Hide the spinner and show error message
+        cubito.style.visibility = 'hidden';
+        const results = document.getElementById('results');
+        results.innerHTML = '<p>An error occurred. Please try again.</p>';
     }
 }
