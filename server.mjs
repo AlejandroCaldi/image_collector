@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
+import archiver from 'archiver';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,7 @@ function sanitizeFilename(filename) {
     return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
 
+
 app.post('/scrape', async (req, res) => {
     const { urls } = req.body;
 
@@ -52,8 +54,6 @@ app.post('/scrape', async (req, res) => {
 
     const downloadDir = path.join(__dirname, 'fotos');
 
-    console.log('downloadDir:', downloadDir);
-
     if (!fs.existsSync(downloadDir)) {
         fs.mkdirSync(downloadDir, { recursive: true });
     }
@@ -61,7 +61,6 @@ app.post('/scrape', async (req, res) => {
     const allImageUrls = [];
 
     try {
-        // Process each URL
         for (const url of urls) {
             const response = await fetch(url);
             const html = await response.text();
@@ -69,19 +68,22 @@ app.post('/scrape', async (req, res) => {
             let imageUrls = [];
 
             $('img').each((index, element) => {
-                const src = $(element).attr('src');
-                console.log('Image src:', src); // Add this line to debug
-            
-                if (src) {
-                    const fullUrl = new URL(src, url).href;
-                    imageUrls.push(fullUrl);
+                try {
+                    const src = $(element).attr('src');
+                    if (src) {
+                        const fullUrl = new URL(src, url).href;
+                        imageUrls.push(fullUrl);
+                    } else {
+                        console.warn('Image src attribute is missing for element:', element);
+                    }
+                } catch (error) {
+                    console.error('Error processing image src:', error);
                 }
             });
 
             allImageUrls.push(...imageUrls);
         }
 
-        // Download each image
         const downloadPromises = allImageUrls.map(async (imageUrl) => {
             try {
                 const imageResponse = await axios({
@@ -89,17 +91,22 @@ app.post('/scrape', async (req, res) => {
                     responseType: 'stream'
                 });
 
-                // Extract filename and sanitize
                 let parsedUrl = new URL(imageUrl);
                 let imageFileName = path.basename(parsedUrl.pathname);
-                imageFileName = replaceAfterChar(imageFileName, '?'); // Remove query parameters from filename
-                imageFileName = sanitizeFilename(imageFileName); // Sanitize the filename
-                imageFileName = ensureJpgExtension(imageFileName); // add extension if needed
+                imageFileName = replaceAfterChar(imageFileName, '?');
+                imageFileName = sanitizeFilename(imageFileName);
+                imageFileName = ensureJpgExtension(imageFileName);
                 const imageFilePath = path.join(downloadDir, imageFileName);
+                
+                console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
+
                 return new Promise((resolve, reject) => {
                     const writer = fs.createWriteStream(imageFilePath);
                     imageResponse.data.pipe(writer);
-                    writer.on('finish', resolve);
+                    writer.on('finish', () => {
+                        console.log(`Downloaded ${imageFilePath}`); // Debug line
+                        resolve();
+                    });
                     writer.on('error', reject);
                 });
             } catch (error) {
@@ -109,12 +116,42 @@ app.post('/scrape', async (req, res) => {
 
         await Promise.all(downloadPromises);
 
-        res.json({ message: 'Images downloaded successfully', imageUrls: allImageUrls });
+        // Create ZIP file
+        const zipPath = path.join(__dirname, 'fotos.zip');
+        const output = fs.createWriteStream(zipPath);
+        const archive = archiver('zip', { zlib: { level: 9 } });
+
+        output.on('close', () => {
+            console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
+        });
+
+        archive.on('error', (err) => {
+            throw err;
+        });
+
+        archive.pipe(output);
+        archive.directory(downloadDir, false);
+        archive.finalize();
+
+        // Send ZIP file to the client
+        res.download(zipPath, 'fotos.zip', (err) => {
+            if (err) {
+                console.error('Error sending file:', err);
+            }
+            // Clean up
+            fs.unlink(zipPath, (unlinkErr) => {
+                if (unlinkErr) {
+                    console.error('Error deleting ZIP file:', unlinkErr);
+                }
+            });
+        });
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Failed to scrape and download images' });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
