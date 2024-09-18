@@ -53,6 +53,7 @@ app.post('/scrape', async (req, res) => {
     }
 
     const downloadDir = path.join(__dirname, 'fotos');
+    console.log('downloadDir:', downloadDir);
 
     if (!fs.existsSync(downloadDir)) {
         fs.mkdirSync(downloadDir, { recursive: true });
@@ -98,26 +99,26 @@ app.post('/scrape', async (req, res) => {
                 imageFileName = ensureJpgExtension(imageFileName);
                 const imageFilePath = path.join(downloadDir, imageFileName);
                 
-                console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
+                //console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
 
                 return new Promise((resolve, reject) => {
                     const writer = fs.createWriteStream(imageFilePath);
                     imageResponse.data.pipe(writer);
                     writer.on('finish', () => {
-                        console.log(`Downloaded ${imageFilePath}`); // Debug line
+                        // console.log(`Downloaded ${imageFilePath}`); // Debug line
                         resolve();
                     });
                     writer.on('error', reject);
                 });
             } catch (error) {
-                console.error(`Error downloading image ${imageUrl}:`, error);
+                // console.error(`Error downloading image ${imageUrl}:`, error);
             }
         });
 
         await Promise.all(downloadPromises);
 
         // Create ZIP file
-        const zipPath = path.join(__dirname, 'fotos.zip');
+        const zipPath = path.join(downloadDir, 'fotos.zip');
         const output = fs.createWriteStream(zipPath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
@@ -130,10 +131,11 @@ app.post('/scrape', async (req, res) => {
         });
 
         archive.pipe(output);
-        archive.directory(downloadDir, false);
+        archive.directory(downloadDir, true);
         archive.finalize();
 
         // Send ZIP file to the client
+        console.log("zipPath is: " + zipPath)
         res.download(zipPath, 'fotos.zip', (err) => {
             if (err) {
                 console.error('Error sending file:', err);
