@@ -20,30 +20,24 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Function to remove everything after and including a specific character
 function replaceAfterChar(str, char) {
     const index = str.indexOf(char);
     if (index === -1) {
-        return str; // Return the original string if the character is not found
+        return str;
     }
     return str.substring(0, index);
 }
 
 function ensureJpgExtension(filename) {
-    // Check if the filename already contains a period
     if (!filename.includes('.')) {
-        // Add '.jpg' if no period is found
         return `${filename}.jpg`;
     }
-    // Return the original filename if it already has an extension
     return filename;
 }
 
-// Function to sanitize filenames for the filesystem
 function sanitizeFilename(filename) {
     return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
-
 
 app.post('/scrape', async (req, res) => {
     const { urls } = req.body;
@@ -53,10 +47,15 @@ app.post('/scrape', async (req, res) => {
     }
 
     const downloadDir = path.join(__dirname, 'fotos');
+    const zipDir = path.join(__dirname, 'zips');
     console.log('downloadDir:', downloadDir);
 
     if (!fs.existsSync(downloadDir)) {
         fs.mkdirSync(downloadDir, { recursive: true });
+    }
+
+    if (!fs.existsSync(zipDir)) {
+        fs.mkdirSync(zipDir, { recursive: true });
     }
 
     const allImageUrls = [];
@@ -98,32 +97,63 @@ app.post('/scrape', async (req, res) => {
                 imageFileName = sanitizeFilename(imageFileName);
                 imageFileName = ensureJpgExtension(imageFileName);
                 const imageFilePath = path.join(downloadDir, imageFileName);
-                
-                //console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
+
+                console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
 
                 return new Promise((resolve, reject) => {
                     const writer = fs.createWriteStream(imageFilePath);
                     imageResponse.data.pipe(writer);
                     writer.on('finish', () => {
-                        // console.log(`Downloaded ${imageFilePath}`); // Debug line
+                        console.log(`Downloaded ${imageFilePath}`); // Debug line
                         resolve();
                     });
                     writer.on('error', reject);
                 });
             } catch (error) {
-                // console.error(`Error downloading image ${imageUrl}:`, error);
+                console.error(`Error downloading image ${imageUrl}:`, error);
             }
         });
 
         await Promise.all(downloadPromises);
 
-        // Create ZIP file
-        const zipPath = path.join(downloadDir, 'fotos.zip');
+        // Check the downloaded files
+        fs.readdir(downloadDir, (err, files) => {
+            if (err) {
+                console.error('Error reading download directory:', err);
+            } else {
+                console.log('Files in download directory:', files);
+            }
+        });
+
+        // Create ZIP file in a different directory
+        const zipPath = path.join(zipDir, 'fotos.zip');
         const output = fs.createWriteStream(zipPath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
         output.on('close', () => {
             console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
+            console.log("zipPath is: " + zipPath);
+            console.log("zipDir is: " + zipDir);
+
+            fs.access(zipPath, fs.constants.F_OK, (err) => {
+                if (err) {
+                    console.error('ZIP file does not exist:', zipPath);
+                    res.status(404).json({ error: 'ZIP file not found' });
+                } else {
+                    res.download(zipPath, 'fotos.zip', (err) => {
+                        if (err) {
+                            console.error('Error sending file:', err);
+                            res.status(500).json({ error: 'Error sending file' });
+                        } else {
+                            fs.unlink(zipPath, (unlinkErr) => {
+                                if (unlinkErr) {
+                                    console.error('Error deleting ZIP file:', unlinkErr);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
 
         archive.on('error', (err) => {
@@ -131,29 +161,14 @@ app.post('/scrape', async (req, res) => {
         });
 
         archive.pipe(output);
-        archive.directory(downloadDir, true);
+        archive.directory(downloadDir, false);
         archive.finalize();
-
-        // Send ZIP file to the client
-        console.log("zipPath is: " + zipPath)
-        res.download(zipPath, 'fotos.zip', (err) => {
-            if (err) {
-                console.error('Error sending file:', err);
-            }
-            // Clean up
-            fs.unlink(zipPath, (unlinkErr) => {
-                if (unlinkErr) {
-                    console.error('Error deleting ZIP file:', unlinkErr);
-                }
-            });
-        });
 
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Failed to scrape and download images' });
     }
 });
-
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
