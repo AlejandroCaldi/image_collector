@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
 import archiver from 'archiver';
+import cors from 'cors';  
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,8 +15,9 @@ console.log('__filename:', __filename);
 console.log('__dirname:', __dirname);
 
 const app = express();
-const port = 3000;
+const port = 443;
 
+app.use(cors());  // Add this line to enable CORS for all routes
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -164,9 +166,12 @@ app.post('/scrape', async (req, res) => {
         archive.directory(downloadDir, false);
         archive.finalize();
 
+        console.log(`Server is running at http://localhost:${port}`);
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Failed to scrape and download images' });
+        console.log(`Server is running at http://localhost:${port}`);
     }
 });
 
