@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="An images collector for user batch given websites. Still an academical excercise. 
                                       intended for crafting pictures datasts. Right now does not operate against logins
                                       or externally placed pictures.">
-    <meta bane="description" content="1. Discover a unique image collection platform designed for users to batch gather images from specified websites, ideal for academic exercises in dataset creation.
+    <meta nane="description"
+        content="1. Discover a unique image collection platform designed for users to batch gather images from specified websites, ideal for academic exercises in dataset creation.
 
     2. Explore our image collector, enabling users to batch collect images from designated websites. Perfect for academic projects focused on crafting picture datasets.
     
@@ -15,13 +17,15 @@
     <link rel="stylesheet" href="styles.css">
     <title>Image Scraper</title>
 </head>
+
 <body>
     <div class="vertical card inter">
         <h1>Scrapper de Imagenes -- Versión 0.2.4</h1>
         <form id="scraper-form" class="vertical">
             <label class="inter" for="urls">Website URLs (one per line):</label>
             <div class="horizontal">
-                <textarea class="input ancho-50" id="urls" name="urls" rows="10" cols="50" required placeholder="Enter URLs, one per line"></textarea>
+                <textarea class="input ancho-50" id="urls" name="urls" rows="10" cols="50" required
+                    placeholder="Enter URLs, one per line"></textarea>
                 <div class="cube-loader hidden" id="cubito">
                     <div class="cube-top"></div>
                     <div class="cube-wrapper">
@@ -34,12 +38,22 @@
             </div>
             <!-- <label class="inter" for="downloadPath">Download Path:</label>
             <input class="input" type="text" id="downloadPath" name="downloadPath" required placeholder="e.g., downloads/images"> -->
+            <label class="inter" for="zipFileName">ZIP File Name:</label>
+            <input class="input" type="text" id="zipFileName" name="zipFileName" required placeholder="Enter ZIP file name">
+
             <button type="submit">Scrape Images</button>
         </form>
+
+        <div class="results">
+            <div id="results"></div>
+        </div>
     </div>
-    <div class="results">
-        <div id="results"></div>
-    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="script.js"></script>
+
 </body>
+
 </html>

@@ -5,19 +5,18 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
-import archiver from 'archiver';
-import cors from 'cors';  
+import archiver from 'archiver'; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('__filename:', __filename);
-console.log('__dirname:', __dirname);
+// console.log('__filename:', __filename);
+// console.log('__dirname:', __dirname);
 
 const app = express();
 const port = 443;
 
-app.use(cors());  // Add this line to enable CORS for all routes
+// app.use(cors());  // Add this line to enable CORS for all routes
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -61,13 +60,13 @@ app.post('/scrape', async (req, res) => {
     }
 
     const allImageUrls = [];
-
+    const imageUrls = [];
     try {
         for (const url of urls) {
             const response = await fetch(url);
             const html = await response.text();
             const $ = cheerio.load(html);
-            let imageUrls = [];
+            
 
             $('img').each((index, element) => {
                 try {
@@ -127,6 +126,7 @@ app.post('/scrape', async (req, res) => {
             }
         });
 
+
         // Create ZIP file in a different directory
         const zipPath = path.join(zipDir, 'fotos.zip');
         const output = fs.createWriteStream(zipPath);
@@ -134,8 +134,6 @@ app.post('/scrape', async (req, res) => {
 
         output.on('close', () => {
             console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
-            console.log("zipPath is: " + zipPath);
-            console.log("zipDir is: " + zipDir);
 
             fs.access(zipPath, fs.constants.F_OK, (err) => {
                 if (err) {
@@ -173,6 +171,9 @@ app.post('/scrape', async (req, res) => {
         res.status(500).json({ error: 'Failed to scrape and download images' });
         console.log(`Server is running at http://localhost:${port}`);
     }
+
+    console.log(`Server is running at http://localhost:${port}`);
+    
 });
 
 app.listen(port, () => {
