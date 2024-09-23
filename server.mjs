@@ -5,18 +5,101 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
-import archiver from 'archiver'; 
+import archiver from 'archiver';
+import bodyParser from 'body-parser';
+import pkg from 'pg';
+
+const { Pool, Client } = pkg;
+
+// Initialize express app
+const app = express();
+const port = 443;
+
+// PostgreSQL client setup
+const client = new Client({
+  user: "postgress",
+  host: "localhost",
+  database: "scraper",
+  password: "Amallas12.",
+  port: 3306,
+});
+
+client.connect();
+
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
+
+// Endpoint for registration
+app.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const userCheck = await client.query(
+      "SELECT * FROM usuario WHERE usuario = $1",
+      [email]
+    );
+
+    if (userCheck.rows.length > 0) {
+      return res.status(400).json({ message: "El usuario ya existe" });
+    }
+
+    await client.query(
+      "INSERT INTO usuario (usuario, password, fecha_registro) VALUES ($1, $2, $3)",
+      [email, password, new Date()]
+    );
+
+    res.status(200).json({ message: "Registro exitoso" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+// Endpoint for login
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await client.query("SELECT * FROM usuario WHERE usuario = $1", [
+      email,
+    ]);
+
+    if (user.rows.length === 0) {
+      return res.status(400).json({ message: "El usuario no existe" });
+    }
+
+    if (user.rows[0].password !== password) {
+      return res.status(400).json({
+        message: "Password is incorrect",
+      });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Succesful login", redirectTo: "/scraper.html" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Endpoint to scraper
+app.get("/scraper", async (req, res) => {
+  try {
+    const result = await client.query(
+      "SELECT id_noticia, titulo, link FROM noticias ORDER BY id_noticia ASC;"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// console.log('__filename:', __filename);
-// console.log('__dirname:', __dirname);
-
-const app = express();
-const port = 443;
-
-// app.use(cors());  // Add this line to enable CORS for all routes
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -126,7 +209,6 @@ app.post('/scrape', async (req, res) => {
             }
         });
 
-
         // Create ZIP file in a different directory
         const zipPath = path.join(zipDir, 'fotos.zip');
         const output = fs.createWriteStream(zipPath);
@@ -164,18 +246,13 @@ app.post('/scrape', async (req, res) => {
         archive.directory(downloadDir, false);
         archive.finalize();
 
-        console.log(`Server is running at http://localhost:${port}`);
-
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Failed to scrape and download images' });
-        console.log(`Server is running at http://localhost:${port}`);
     }
-
-    console.log(`Server is running at http://localhost:${port}`);
-    
 });
 
+// Start the server
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server started at http://localhost:${port}`);
 });

@@ -197,3 +197,12 @@ h1 {
   visibility: hidden;
 }
 
+.cover-photo{
+  background-image: url("/public/images/Iscraper.jpg");
+  background-repeat: no-repeat;
+  background-position:20%;
+}
+
+.opacity-50{
+  opacity: 85%;
+}
