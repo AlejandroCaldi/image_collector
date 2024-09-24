@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username');
+    
     document.getElementById('scraper-form').addEventListener('submit', function(event) {
         event.preventDefault();
         const urls = document.getElementById('urls').value.split('\n').map(url => url.trim()).filter(url => url);

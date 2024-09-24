@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login").addEventListener("submit", async (e) => {
     e.preventDefault(); // Prevent the default form submission
-    console.log("Form submitted"); // Log when the form is submitted
 
     const email = document.querySelector('input[type="text"]').value;
     const password = document.querySelector('input[type="password"]').value;
@@ -16,11 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await response.json();
-      console.log(data); // Log the response data
 
       if (response.ok) {
-        // Redirect on successful login
-        window.location.href = data.redirectTo;
+        // Redirect on successful login, passing the username
+        window.location.href = `/scraper.html?username=${encodeURIComponent(data.username)}`;
       } else {
         alert(data.message); // Show error message
       }
@@ -30,3 +28,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+

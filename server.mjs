@@ -69,7 +69,7 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [rows] = await pool.query("SELECT * FROM scraper.usuarios WHERE usuario = ?", [
+    const [rows] = await pool.query("SELECT usuario, password FROM scraper.usuarios WHERE usuario = ?", [
       email,
     ]);
 
@@ -82,8 +82,17 @@ app.post("/login", async (req, res) => {
     if (rows[0].password !== password) {
       return res.status(400).json({ message: "Password is incorrect" });
     }
+    if (rows.length > 0) {
+      res.status(200).json({
+        message: "Succesful login",
+        redirectTo: "/scraper.html?username=" + rows[0].usuario, // Pass username in URL
+      });
+    }
 
-    res.status(200).json({ message: "Succesful login", redirectTo: "/scraper.html" });
+    // res.status(200).json({
+    //   message: "Succesful login",
+    //   redirectTo: "/scraper.html?username=" + rows[0].usuario, // Pass username in URL
+
   } catch (error) {
     console.error("Database error:", error); // Log any database errors
     res.status(500).json({ message: "Server error" });
@@ -113,15 +122,24 @@ function sanitizeFilename(filename) {
     return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
 
+// Function to get URL parameters
+  function getQueryParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
 app.post('/scrape', async (req, res) => {
     const { urls } = req.body;
 
     if (!urls || !urls.length) {
         return res.status(400).json({ error: 'At least one URL is required' });
     }
+    console.log("Username:", username);
+    const fotosPath = `fotos/${username}`;
+    const zipPath = `zips/${username}`;
 
-    const downloadDir = path.join(__dirname, 'fotos/' + );
-    const zipDir = path.join(__dirname, 'zips');
+    const downloadDir = path.join(__dirname, fotosPath);
+    const zipDir = path.join(__dirname, zipPath);
     console.log('downloadDir:', downloadDir);
 
     if (!fs.existsSync(downloadDir)) {
