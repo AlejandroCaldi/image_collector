@@ -7,46 +7,51 @@ import { fileURLToPath } from 'url';
 import axios from 'axios';
 import archiver from 'archiver';
 import bodyParser from 'body-parser';
-import pkg from 'pg';
-
-const { Pool, Client } = pkg;
+import mysql from 'mysql2/promise'; // Import mysql2 with promise support
 
 // Initialize express app
 const app = express();
 const port = 443;
 
-// PostgreSQL client setup
-const client = new Client({
-  user: "postgress",
-  host: "localhost",
-  database: "scraper",
-  password: "Amallas12.",
-  port: 3306,
-});
 
-client.connect();
+// MySQL client setup
+const dbConfig = {
+  host: "localhost",
+  user: "root",
+  password: "Amallas12.",
+  database: "scraper"
+};
+
+const pool = mysql.createPool(dbConfig);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public'))); 
+
+// Route for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Endpoint for registration
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const userCheck = await client.query(
-      "SELECT * FROM usuario WHERE usuario = $1",
+    const [rows] = await pool.query(
+      "SELECT * FROM usuarios WHERE usuario = ?",
       [email]
     );
 
-    if (userCheck.rows.length > 0) {
+    if (rows.length > 0) {
       return res.status(400).json({ message: "El usuario ya existe" });
     }
 
-    await client.query(
-      "INSERT INTO usuario (usuario, password, fecha_registro) VALUES ($1, $2, $3)",
+    await pool.query(
+      "INSERT INTO usuarios (usuario, password, fecha_registro) VALUES (?, ?, ?)",
       [email, password, new Date()]
     );
 
@@ -62,15 +67,15 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await client.query("SELECT * FROM usuario WHERE usuario = $1", [
+    const [rows] = await pool.query("SELECT * FROM usuarios WHERE usuario = ?", [
       email,
     ]);
 
-    if (user.rows.length === 0) {
+    if (rows.length === 0) {
       return res.status(400).json({ message: "El usuario no existe" });
     }
 
-    if (user.rows[0].password !== password) {
+    if (rows[0].password !== password) {
       return res.status(400).json({
         message: "Password is incorrect",
       });
@@ -84,23 +89,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Endpoint to scraper
-app.get("/scraper", async (req, res) => {
-  try {
-    const result = await client.query(
-      "SELECT id_noticia, titulo, link FROM noticias ORDER BY id_noticia ASC;"
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
-  }
-});
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
