@@ -16,39 +16,35 @@
 <!-- <p>If you are not redirected automatically, <a href="/public/index.html">click here</a>.</p> -->
 
 <body class="inter ">
-
-
-
     <div class="cover-photo vertical">
         <div class="card opacity-50 height-50" id="titulo">
-            <h1>Image Scrapper -- Version 0.2.4</h1>
+            <h1>Image Scrapper -- Version 0.2.6</h1>
         </div>
         <div class="horizontal">
-            <div class="card vertical opacity-50 height-300">
+            <form id="login" class="card vertical opacity-50 height-300">
                 <h1>Login</h1>
                 <div class="horizontal">
-                    <input type="text" class="input ancho-50" placeholder="Username">
+                    <input type="text" class="input ancho-50" placeholder="Username" required>
                 </div>
                 <div class="horizontal">
-                    <input type="password" class="input ancho-50" placeholder="Password">
+                    <input type="password" class="input ancho-50" placeholder="Password" required>
                 </div>
-                <button>Login</button>
-            </div>
+                <button type="submit">Login</button>
+            </form>
 
             <div class="card vertical opacity-50 height-300">
                 <h1>Create User</h1>
                 <div class="horizontal">
-                    <input type="text" class="input ancho-50" placeholder="Username">
+                    <input type="text" class="input ancho-50" placeholder="Username" required>
                 </div>
                 <div class="horizontal">
-                    <input type="password" class="input ancho-50" placeholder="Password">
+                    <input type="password" class="input ancho-50" placeholder="Password" required>
                 </div>
-                <a href="create-user.html">
-                    <button>Create User</button>
-                </a>
+                <button type="submit">Create User</button>
             </div>
         </div>
     </div>
+    <script src="login-page-script.js"></script>
 </body>
 
 </html>

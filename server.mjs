@@ -51,7 +51,7 @@ app.post("/register", async (req, res) => {
     }
 
     await pool.query(
-      "INSERT INTO usuarios (usuario, password, fecha_registro) VALUES (?, ?, ?)",
+      "INSERT INTO usuarios (usuario, password, VALUES (?, ?)",
       [email, password, new Date()]
     );
 
@@ -64,27 +64,28 @@ app.post("/register", async (req, res) => {
 
 // Endpoint for login
 app.post("/login", async (req, res) => {
+  console.log("Login attempt:", req.body); // Log the incoming request body
+
   const { email, password } = req.body;
 
   try {
-    const [rows] = await pool.query("SELECT * FROM usuarios WHERE usuario = ?", [
+    const [rows] = await pool.query("SELECT * FROM scraper.usuarios WHERE usuario = ?", [
       email,
     ]);
 
+    console.log("Query result:", rows); // Log the result of the query
+
     if (rows.length === 0) {
-      return res.status(400).json({ message: "El usuario no existe" });
+      return res.status(400).json({ message: "El usuario no existe." });
     }
 
     if (rows[0].password !== password) {
-      return res.status(400).json({
-        message: "Password is incorrect",
-      });
+      return res.status(400).json({ message: "Password is incorrect" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Succesful login", redirectTo: "/scraper.html" });
+    res.status(200).json({ message: "Succesful login", redirectTo: "/scraper.html" });
   } catch (error) {
+    console.error("Database error:", error); // Log any database errors
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -119,7 +120,7 @@ app.post('/scrape', async (req, res) => {
         return res.status(400).json({ error: 'At least one URL is required' });
     }
 
-    const downloadDir = path.join(__dirname, 'fotos');
+    const downloadDir = path.join(__dirname, 'fotos/' + );
     const zipDir = path.join(__dirname, 'zips');
     console.log('downloadDir:', downloadDir);
 
