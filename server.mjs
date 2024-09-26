@@ -86,13 +86,15 @@ app.post("/login", async (req, res) => {
     }
     if (rows.length > 0) {
 
-      console.log("Usuario: " + rows[0].usuario)
+      console.log("Usuario: " + "/scraper.html?username=" + rows[0].usuario)
 
       res.status(200).json({
-        message: "Succesful login",
-        redirectTo: "/scraper.html?username=" + rows[0].usuario, // Pass username in URL
-      });
+        message: "Successful login",
+        username: rows[0].usuario,  
+        redirectTo: `/scraper.html?username=${encodeURIComponent(rows[0].usuario)}`,
+    });
     }
+
 
   } catch (error) {
     console.error("Database error:", error); // Log any database errors
@@ -121,12 +123,6 @@ function ensureJpgExtension(filename) {
 
 function sanitizeFilename(filename) {
   return filename.replace(/[\/\\?%*:|"<>]/g, '_');
-}
-
-// Function to get URL parameters
-function getQueryParameter(name) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(name);
 }
 
 app.post('/scrape', async (req, res) => {

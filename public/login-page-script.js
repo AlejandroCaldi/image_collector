@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         // Redirect on successful login, passing the username
+        console.log("username: " + data.username)
         window.location.href = `/scraper.html?username=${encodeURIComponent(data.username)}`;
       } else {
         alert(data.message); // Show error message
@@ -28,4 +29,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
