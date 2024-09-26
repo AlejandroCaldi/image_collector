@@ -227,43 +227,52 @@ app.post('/scrape', async (req, res) => {
       const archive = archiver('zip', { zlib: { level: 9 } });
 
       output.on('close', () => {
-          console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
+        console.log(`ZIP file has been finalized. Total bytes: ${archive.pointer()}`);
 
-          fs.access(zipFilePath, fs.constants.F_OK, (err) => {
-              if (err) {
-                  console.error('ZIP file does not exist:', zipFilePath);
-                  res.status(404).json({ error: 'ZIP file not found' });
-              } else {
-                  res.download(zipFilePath, 'fotos.zip', (err) => {
-                      if (err) {
-                          console.error('Error sending file:', err);
-                          res.status(500).json({ error: 'Error sending file' });
-                      } else {
-                          fs.unlink(zipFilePath, (unlinkErr) => {
-                              if (unlinkErr) {
-                                  console.error('Error deleting ZIP file:', unlinkErr);
-                              }
-                          });
-                      }
-                  });
-              }
-          });
-      });
+        fs.access(zipFilePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                console.error('ZIP file does not exist:', zipFilePath);
+                return res.status(404).json({ error: 'ZIP file not found' });
+            } else {
+                res.download(zipFilePath, 'fotos.zip', (err) => {
+                    if (err) {
+                        console.error('Error sending file:', err);
+                        return res.status(500).json({ error: 'Error sending file' });
+                    } else {
+                        // Delete the downloaded images folder after sending the ZIP file
+                        fs.rm(downloadDir, { recursive: true, force: true }, (unlinkErr) => {
+                            if (unlinkErr) {
+                                console.error('Error deleting folder:', unlinkErr);
+                            } else {
+                                console.log(`Folder ${downloadDir} deleted successfully.`);
+                            }
+                        });
 
-      archive.on('error', (err) => {
-          throw err;
-      });
+                        // Also delete the ZIP file after sending
+                        fs.unlink(zipFilePath, (unlinkErr) => {
+                            if (unlinkErr) {
+                                console.error('Error deleting ZIP file:', unlinkErr);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
 
-      archive.pipe(output);
-      archive.directory(downloadDir, false);
-      archive.finalize();
+    archive.on('error', (err) => {
+        throw err;
+    });
 
-  } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Failed to scrape and download images' });
-  }
+    archive.pipe(output);
+    archive.directory(downloadDir, false);
+    archive.finalize();
+
+} catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to scrape and download images' });
+}
 });
-
 
 // Start the server
 app.listen(port, () => {
