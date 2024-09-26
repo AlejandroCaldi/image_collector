@@ -38,29 +38,32 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+
+
 // Endpoint for registration
 app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
+  console.log("data: " + { username, email, password })
 
   try {
     const [rows] = await pool.query(
       "SELECT * FROM usuarios WHERE usuario = ?",
-      [email]
+      [username]
     );
 
     if (rows.length > 0) {
-      return res.status(400).json({ message: "El usuario ya existe" });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     await pool.query(
-      "INSERT INTO usuarios (usuario, password, VALUES (?, ?)",
-      [email, password, new Date()]
+      "INSERT INTO scraper.usuarios VALUES (0, ?, ?, ?);",
+      [username, email, password]
     );
 
-    res.status(200).json({ message: "Registro exitoso" });
+    res.status(200).json({ message: "User Registration Successful" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error del servidor" });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
@@ -78,7 +81,7 @@ app.post("/login", async (req, res) => {
     console.log("Query result:", rows); 
 
     if (rows.length === 0) {
-      return res.status(400).json({ message: "El usuario no existe." });
+      return res.status(400).json({ message: "User does not exists." });
     }
 
     if (rows[0].password !== password) {
@@ -124,6 +127,9 @@ function ensureJpgExtension(filename) {
 function sanitizeFilename(filename) {
   return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
+
+
+
 
 app.post('/scrape', async (req, res) => {
   const { urls } = req.body;

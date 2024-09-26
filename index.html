@@ -28,7 +28,7 @@
 <body class="inter ">
     <div class="cover-photo vertical">
         <div class="card opacity-50 height-50" id="titulo">
-            <h1>Image Scrapper -- Version 0.3.1</h1>
+            <h1>Image Scrapper -- Version 0.4.0</h1>
         </div>
         <div class="horizontal">
             <form id="login" class="card vertical opacity-50 height-300">
@@ -42,18 +42,27 @@
                 <button type="submit">Login</button>
             </form>
 
-            <div class="card vertical opacity-50 height-300">
+            <form id="create_user" class="card vertical opacity-50 height-400">
                 <h1>Create User</h1>
                 <div class="horizontal">
-                    <input type="text" class="input ancho-50" placeholder="Username" required>
+                    <input type="text" id="create_username" class="input ancho-50" placeholder="Username" required>
                 </div>
                 <div class="horizontal">
-                    <input type="password" class="input ancho-50" placeholder="Password" required>
+                    <input type="text" id="create_email" class="input ancho-50" placeholder="Email" required>
+                </div>
+                <div class="horizontal">
+                    <input type="password" id="create_password" class="input ancho-50" placeholder="Password" required>
+                </div>
+                <div class="horizontal">
+                    <input type="password" id="create_password2" class="input ancho-50" placeholder="Confirm Password" required>
                 </div>
                 <button type="submit">Create User</button>
-            </div>
+                <div id="mensajeError" style="color: red; visibility: hidden;"></div>
+            </form>
+
         </div>
     </div>
+
     <script src="login-page-script.js"></script>
 </body>
 
