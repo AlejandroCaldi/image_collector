@@ -15,12 +15,14 @@
     3. Utilize our image collection tool to batch gather images from selected websites. This platform serves as an academic exercise for developing comprehensive picture datasets.">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/images/Iscraper_ico.png" type="image/png">
+
     <title>Image Scraper</title>
 </head>
 
-<body>
-    <div class="vertical card inter">
-        <h1>Scrapper de Imagenes -- Versión 0.2.4</h1>
+<body class="cover-photo">
+    <div class="vertical card inter opacity-50">
+        <h1>Image Scrapper -- Version 0.2.7</h1>
         <form id="scraper-form" class="vertical">
             <label class="inter" for="urls">Website URLs (one per line):</label>
             <div class="horizontal">
@@ -36,12 +38,7 @@
                     </div>
                 </div>
             </div>
-            <!-- <label class="inter" for="downloadPath">Download Path:</label>
-            <input class="input" type="text" id="downloadPath" name="downloadPath" required placeholder="e.g., downloads/images"> -->
-            <label class="inter" for="zipFileName">ZIP File Name:</label>
-            <input class="input" type="text" id="zipFileName" name="zipFileName" required placeholder="Enter ZIP file name">
-
-            <button type="submit">Scrape Images</button>
+            <button type="submit">Scrape Sites</button>
         </form>
 
         <div class="results">
@@ -53,7 +50,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="script.js"></script>
-
 </body>
 
 </html>

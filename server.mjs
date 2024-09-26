@@ -5,177 +5,271 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
-import archiver from 'archiver'; 
+import archiver from 'archiver';
+import bodyParser from 'body-parser';
+import mysql from 'mysql2/promise'; // Import mysql2 with promise support
+import cors from 'cors';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// console.log('__filename:', __filename);
-// console.log('__dirname:', __dirname);
-
+// Initialize express app
 const app = express();
 const port = 443;
 
-// app.use(cors());  // Add this line to enable CORS for all routes
-app.use(express.static('public'));
+
+// MySQL client setup
+const dbConfig = {
+  host: "localhost",
+  user: "root",
+  password: "Amallas12.",
+  database: "scraper"
+};
+
+const pool = mysql.createPool(dbConfig);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
+
+// Route for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Endpoint for registration
+app.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM usuarios WHERE usuario = ?",
+      [email]
+    );
+
+    if (rows.length > 0) {
+      return res.status(400).json({ message: "El usuario ya existe" });
+    }
+
+    await pool.query(
+      "INSERT INTO usuarios (usuario, password, VALUES (?, ?)",
+      [email, password, new Date()]
+    );
+
+    res.status(200).json({ message: "Registro exitoso" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+// Endpoint for login
+app.post("/login", async (req, res) => {
+  console.log("Login attempt:", req.body); // Log the incoming request body
+
+  const { email, password } = req.body;
+
+  try {
+    const [rows] = await pool.query("SELECT usuario, password FROM scraper.usuarios WHERE usuario = ?", [
+      email,
+    ]);
+
+    console.log("Query result:", rows); 
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "El usuario no existe." });
+    }
+
+    if (rows[0].password !== password) {
+      return res.status(400).json({ message: "Password is incorrect" });
+    }
+    if (rows.length > 0) {
+
+      console.log("Usuario: " + rows[0].usuario)
+
+      res.status(200).json({
+        message: "Succesful login",
+        redirectTo: "/scraper.html?username=" + rows[0].usuario, // Pass username in URL
+      });
+    }
+
+  } catch (error) {
+    console.error("Database error:", error); // Log any database errors
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 function replaceAfterChar(str, char) {
-    const index = str.indexOf(char);
-    if (index === -1) {
-        return str;
-    }
-    return str.substring(0, index);
+  const index = str.indexOf(char);
+  if (index === -1) {
+    return str;
+  }
+  return str.substring(0, index);
 }
 
 function ensureJpgExtension(filename) {
-    if (!filename.includes('.')) {
-        return `${filename}.jpg`;
-    }
-    return filename;
+  if (!filename.includes('.')) {
+    return `${filename}.jpg`;
+  }
+  return filename;
 }
 
 function sanitizeFilename(filename) {
-    return filename.replace(/[\/\\?%*:|"<>]/g, '_');
+  return filename.replace(/[\/\\?%*:|"<>]/g, '_');
+}
+
+// Function to get URL parameters
+function getQueryParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
 }
 
 app.post('/scrape', async (req, res) => {
-    const { urls } = req.body;
+  const { urls } = req.body;
 
-    if (!urls || !urls.length) {
-        return res.status(400).json({ error: 'At least one URL is required' });
-    }
+  if (!urls || !urls.length) {
+      return res.status(400).json({ error: 'At least one URL is required' });
+  }
 
-    const downloadDir = path.join(__dirname, 'fotos');
-    const zipDir = path.join(__dirname, 'zips');
-    console.log('downloadDir:', downloadDir);
+  // Fetch username from query parameter
+  const username = req.query.username; // Ensure this line exists
+  if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+  }
 
-    if (!fs.existsSync(downloadDir)) {
-        fs.mkdirSync(downloadDir, { recursive: true });
-    }
+  const fotosPath = `fotos/${username}`;
+  const zipPath = `zips/${username}`;
 
-    if (!fs.existsSync(zipDir)) {
-        fs.mkdirSync(zipDir, { recursive: true });
-    }
+  const downloadDir = path.join(__dirname, fotosPath);
+  const zipDir = path.join(__dirname, zipPath);
+  console.log('downloadDir:', downloadDir);
+  console.log('zipDir:', zipDir);
 
-    const allImageUrls = [];
-    const imageUrls = [];
-    try {
-        for (const url of urls) {
-            const response = await fetch(url);
-            const html = await response.text();
-            const $ = cheerio.load(html);
-            
+  if (!fs.existsSync(downloadDir)) {
+      fs.mkdirSync(downloadDir, { recursive: true });
+  }
 
-            $('img').each((index, element) => {
-                try {
-                    const src = $(element).attr('src');
-                    if (src) {
-                        const fullUrl = new URL(src, url).href;
-                        imageUrls.push(fullUrl);
-                    } else {
-                        console.warn('Image src attribute is missing for element:', element);
-                    }
-                } catch (error) {
-                    console.error('Error processing image src:', error);
-                }
-            });
+  if (!fs.existsSync(zipDir)) {
+      fs.mkdirSync(zipDir, { recursive: true });
+  }
 
-            allImageUrls.push(...imageUrls);
-        }
+  const allImageUrls = [];
+  const imageUrls = [];
+  try {
+      for (const url of urls) {
+          const response = await fetch(url);
+          const html = await response.text();
+          const $ = cheerio.load(html);
 
-        const downloadPromises = allImageUrls.map(async (imageUrl) => {
-            try {
-                const imageResponse = await axios({
-                    url: imageUrl,
-                    responseType: 'stream'
-                });
+          $('img').each((index, element) => {
+              try {
+                  const src = $(element).attr('src');
+                  if (src) {
+                      const fullUrl = new URL(src, url).href;
+                      imageUrls.push(fullUrl);
+                  } else {
+                      console.warn('Image src attribute is missing for element:', element);
+                  }
+              } catch (error) {
+                  console.error('Error processing image src:', error);
+              }
+          });
 
-                let parsedUrl = new URL(imageUrl);
-                let imageFileName = path.basename(parsedUrl.pathname);
-                imageFileName = replaceAfterChar(imageFileName, '?');
-                imageFileName = sanitizeFilename(imageFileName);
-                imageFileName = ensureJpgExtension(imageFileName);
-                const imageFilePath = path.join(downloadDir, imageFileName);
+          allImageUrls.push(...imageUrls);
+      }
 
-                console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
+      const downloadPromises = allImageUrls.map(async (imageUrl) => {
+          try {
+              const imageResponse = await axios({
+                  url: imageUrl,
+                  responseType: 'stream'
+              });
 
-                return new Promise((resolve, reject) => {
-                    const writer = fs.createWriteStream(imageFilePath);
-                    imageResponse.data.pipe(writer);
-                    writer.on('finish', () => {
-                        console.log(`Downloaded ${imageFilePath}`); // Debug line
-                        resolve();
-                    });
-                    writer.on('error', reject);
-                });
-            } catch (error) {
-                console.error(`Error downloading image ${imageUrl}:`, error);
-            }
-        });
+              let parsedUrl = new URL(imageUrl);
+              let imageFileName = path.basename(parsedUrl.pathname);
+              imageFileName = replaceAfterChar(imageFileName, '?');
+              imageFileName = sanitizeFilename(imageFileName);
+              imageFileName = ensureJpgExtension(imageFileName);
+              const imageFilePath = path.join(downloadDir, imageFileName);
 
-        await Promise.all(downloadPromises);
+              //console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
 
-        // Check the downloaded files
-        fs.readdir(downloadDir, (err, files) => {
-            if (err) {
-                console.error('Error reading download directory:', err);
-            } else {
-                console.log('Files in download directory:', files);
-            }
-        });
+              return new Promise((resolve, reject) => {
+                  const writer = fs.createWriteStream(imageFilePath);
+                  imageResponse.data.pipe(writer);
+                  writer.on('finish', () => {
+                      //console.log(`Downloaded ${imageFilePath}`); // Debug line
+                      resolve();
+                  });
+                  writer.on('error', reject);
+              });
+          } catch (error) {
+              console.error(`Error downloading image ${imageUrl}:`, error);
+          }
+      });
 
+      await Promise.all(downloadPromises);
 
-        // Create ZIP file in a different directory
-        const zipPath = path.join(zipDir, 'fotos.zip');
-        const output = fs.createWriteStream(zipPath);
-        const archive = archiver('zip', { zlib: { level: 9 } });
+      // Check the downloaded files
+      fs.readdir(downloadDir, (err, files) => {
+          if (err) {
+              console.error('Error reading download directory:', err);
+          } else {
+              //console.log('Files in download directory:', files);
+              console.log("Todo bien hasta acá. Cantida de fotos bajadas: " + files.length)
+          }
+      });
 
-        output.on('close', () => {
-            console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
+      // Create ZIP file in a different directory
+      const zipFilePath = path.join(zipDir, 'fotos.zip');
+      const output = fs.createWriteStream(zipFilePath);
+      const archive = archiver('zip', { zlib: { level: 9 } });
 
-            fs.access(zipPath, fs.constants.F_OK, (err) => {
-                if (err) {
-                    console.error('ZIP file does not exist:', zipPath);
-                    res.status(404).json({ error: 'ZIP file not found' });
-                } else {
-                    res.download(zipPath, 'fotos.zip', (err) => {
-                        if (err) {
-                            console.error('Error sending file:', err);
-                            res.status(500).json({ error: 'Error sending file' });
-                        } else {
-                            fs.unlink(zipPath, (unlinkErr) => {
-                                if (unlinkErr) {
-                                    console.error('Error deleting ZIP file:', unlinkErr);
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        });
+      output.on('close', () => {
+          console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
 
-        archive.on('error', (err) => {
-            throw err;
-        });
+          fs.access(zipFilePath, fs.constants.F_OK, (err) => {
+              if (err) {
+                  console.error('ZIP file does not exist:', zipFilePath);
+                  res.status(404).json({ error: 'ZIP file not found' });
+              } else {
+                  res.download(zipFilePath, 'fotos.zip', (err) => {
+                      if (err) {
+                          console.error('Error sending file:', err);
+                          res.status(500).json({ error: 'Error sending file' });
+                      } else {
+                          fs.unlink(zipFilePath, (unlinkErr) => {
+                              if (unlinkErr) {
+                                  console.error('Error deleting ZIP file:', unlinkErr);
+                              }
+                          });
+                      }
+                  });
+              }
+          });
+      });
 
-        archive.pipe(output);
-        archive.directory(downloadDir, false);
-        archive.finalize();
+      archive.on('error', (err) => {
+          throw err;
+      });
 
-        console.log(`Server is running at http://localhost:${port}`);
+      archive.pipe(output);
+      archive.directory(downloadDir, false);
+      archive.finalize();
 
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Failed to scrape and download images' });
-        console.log(`Server is running at http://localhost:${port}`);
-    }
-
-    console.log(`Server is running at http://localhost:${port}`);
-    
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Failed to scrape and download images' });
+  }
 });
 
+
+// Start the server
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server started at http://localhost:${port}`);
 });
