@@ -1,4 +1,39 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Function to check if cookies are accepted
+  function checkCookiesAcceptance() {
+    return document.cookie.split(';').some((item) => item.trim().startsWith('cookiesAccepted='));
+  }
+
+  // Function to set the cookie
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = `${name}=${value};${expires};path=/`;
+  }
+
+  const cookieBanner = document.getElementById('cookie-banner');
+  const acceptCookiesButton = document.getElementById('accept-cookies');
+  const learnMoreCookiesButton = document.getElementById('learn-more-cookies');
+
+  // Show the cookie banner if cookies are not accepted
+  if (!checkCookiesAcceptance()) {
+    cookieBanner.style.display = 'flex';
+  }
+
+  // Set the cookie when the user accepts
+  acceptCookiesButton.addEventListener('click', () => {
+    setCookie('cookiesAccepted', 'true', 365); // Cookie expires in 1 year
+    cookieBanner.style.display = 'none';
+  });
+
+
+  learnMoreCookiesButton.addEventListener('click', () => { 
+    window.open('/cookie-policy.html', '_blank');
+  });
+
+
   document.getElementById("login").addEventListener("submit", async (e) => {
     e.preventDefault(); // Prevent the default form submission
 
@@ -98,3 +133,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   };
 });
+
+// Function to show the cookie banner
+function showCookieBanner() {
+  console.log('showCookieBanner function called');
+  const cookieBanner = document.getElementById('cookieBanner');
+  const overlay = document.getElementById('overlay');
+  if (cookieBanner && overlay) {
+      cookieBanner.style.display = 'block';
+      overlay.style.display = 'block';
+  } else {
+      console.error('Cookie banner or overlay element not found');
+  }
+}
+
+// Function to hide the cookie banner
+function acceptCookies() {
+  console.log('acceptCookies function called');
+  const cookieBanner = document.getElementById('cookieBanner');
+  const overlay = document.getElementById('overlay');
+  if (cookieBanner && overlay) {
+      cookieBanner.style.display = 'none';
+      overlay.style.display = 'none';
+      localStorage.setItem('cookiesAccepted', 'true');
+  } else {
+      console.error('Cookie banner or overlay element not found');
+  }
+}
+
+// Function to check if cookies have been accepted
+function checkCookiesAcceptance() {
+  console.log('checkCookiesAcceptance function called');
+  showCookieBanner();
+}
+
+// Run the check when the page loads
+

@@ -1,11 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
 
-.inter {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: normal;
+.cardo-regular {
+  font-family: "Cardo", serif;
+  font-weight: 400;
   font-style: normal;
+}
+
+.cardo-bold {
+  font-family: "Cardo", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.cardo-regular-italic {
+  font-family: "Cardo", serif;
+  font-weight: 400;
+  font-style: italic;
 }
 
 
@@ -192,7 +204,7 @@ a {
 .cover-photo {
   background-image: url("/images/Iscraper.jpg"); 
   background-repeat: no-repeat;
-  background-position: 20%;
+  background-position: 30%;
 }
 
 .opacity-50{
@@ -223,10 +235,61 @@ html, body {
   height: 400px;
 }
 
+.height-1000{
+  height: 985px;
+}
+
+
 .height-50{
   height: 50px;
 }
 
 h1{
  margin-top: 5px;
+}
+
+
+
+cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background:  rgb(227, 227, 97);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  display: none; /* Initially hidden */
+
+}
+
+.cookie-banner p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.cookie-banner button {
+  background:  #23c483;
+  color: #333;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.amarillo{
+  background-color: rgb(227, 227, 97);
+  width: 95%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.opacidad-50{
+opacity:50%;
+}
+
+.photo-size-1050{
+  background-position: 110%;
 }
