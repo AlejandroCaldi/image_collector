@@ -21,11 +21,18 @@
 </head>
 
 <body class="cover-photo">
+
+    <header>
+    
+        <button id="switch-language" class="configuracion" data-i18n="idioma"></button>
+        <button id="cambiar-tema" class="configuracion"> </button>
+    
+    </header>
     
     <div class="vertical card inter opacity-50">
         <h1>(IM)a(G)e Scrapper</h1>
         <form id="scraper-form" class="vertical">
-            <label class="inter" for="urls">Website URLs (one per line):</label>
+            <label class="inter" for="urls" data-i18n="1-por-linea"></label>
             <div class="horizontal">
                 <textarea class="input ancho-50" id="urls" name="urls" rows="10" cols="50" required
                     placeholder="Enter URLs, one per line"></textarea>
@@ -39,7 +46,7 @@
                     </div>
                 </div>
             </div>
-            <button type="submit">Scrape Sites</button>
+            <button type="submit" data-i18n="scrap-it">Scrape Sites</button>
         </form>
 
         <div class="results">
@@ -50,6 +57,10 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/jquery@latest/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/i18next@latest/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend@latest/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@latest/i18nextBrowserLanguageDetector.min.js"></script>
     <script src="script.js"></script>
 </body>
 

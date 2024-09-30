@@ -13,5 +13,7 @@
   "p2": "Cookies are automatic procedures for collecting information relating to the preferences determined by the User during their visit to the Website in order to recognize them as a User, and personalize their experience and use of the Website, and may also, for example, help to identify and resolve errors.", 
   "p3": "The information collected through cookies may include the date and time of visits to the Website, the pages viewed, the time spent on the Website and the sites visited just before and after the visit. However, no cookie allows the cookie to contact the User's telephone number or any other means of personal contact. No cookie can extract information from the User's hard drive or steal personal information. The only way for the User's private information to form part of the Cookie file is for the User to personally provide that information to the server.", 
   "p4": "Cookies that allow a person to be identified are considered personal data. Therefore, the Privacy Policy described above will apply to them. In this sense, the User's consent will be required for their use. This consent will be communicated, based on an authentic choice, offered through an affirmative and positive decision, before the initial, removable and documented treatment.", 
-  "p5": "Own cookies"
+  "p5": "Own cookies",
+  "1-por-linea":"Website URLs (one per line):",
+  "scrap-it": "Scrape Images"
 }
