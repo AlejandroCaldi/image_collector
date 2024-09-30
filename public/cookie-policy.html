@@ -6,44 +6,33 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/images/Iscraper_ico.png" type="image/png">
 
-    <title>Cookies Policy</title>
+    <title data-i18n="cookies-tit"></title>
 
 </head>
 <body class="cardo-regular cover-photo">
+
+    <header>
+    
+        <button id="switch-language" class="configuracion" data-i18n="idioma"></button>
+        <button id="cambiar-tema" class="configuracion"> </button>
+    
+    </header>
+
     <div id="cookieBanner" class="cookie-banner card height-1000 amarillo opacidad-50">
         <div class="row">
             <div>
-                <div class="paper">
-                    <header class="text-center">
-                        <h2 class="m-auto">POLÍTICA DE COOKIES</h2>
-                        <h4><span class="blanc-space ng-binding">(Im)a(g)e Scrapper</span></h4>
-                    </header>
+                <div>
+                    <div class="text-center">
+                        <h2 data-i18n="cookies-tit2"></h2>
+                        <h4><span>(Im)a(g)e Scrapper</span></h4>
+                    </hdiv>
                     <div>
-                        <p>El acceso a este Sitio Web puede implicar la utilización de cookies. Las cookies son pequeñas
-                            cantidades de información que se almacenan en el navegador utilizado por cada Usuario —en
-                            los distintos dispositivos que pueda utilizar para navegar— para que el servidor recuerde
-                            cierta información que posteriormente y únicamente el servidor que la implementó leerá. Las
-                            cookies facilitan la navegación, la hacen más amigable, y no dañan el dispositivo de
-                            navegación.</p>
-                        <p>Las cookies son procedimientos automáticos de recogida de información relativa a las
-                            preferencias determinadas por el Usuario durante su visita al Sitio Web con el fin de
-                            reconocerlo como Usuario, y personalizar su experiencia y el uso del Sitio Web, y pueden
-                            también, por ejemplo, ayudar a identificar y resolver errores.</p>
-                        <p>La información recabada a través de las cookies puede incluir la fecha y hora de visitas al
-                            Sitio Web, las páginas visionadas, el tiempo que ha estado en el Sitio Web y los sitios
-                            visitados justo antes y después del mismo. Sin embargo, ninguna cookie permite que esta
-                            misma pueda contactarse con el número de teléfono del Usuario o con cualquier otro medio de
-                            contacto personal. Ninguna cookie puede extraer información del disco duro del Usuario o
-                            robar información personal. La única manera de que la información privada del Usuario forme
-                            parte del archivo Cookie es que el usuario dé personalmente esa información al servidor.</p>
-                        <p>Las cookies que permiten identificar a una persona se consideran datos personales. Por tanto,
-                            a las mismas les será de aplicación la Política de Privacidad anteriormente descrita. En
-                            este sentido, para la utilización de las mismas será necesario el consentimiento del
-                            Usuario. Este consentimiento será comunicado, en base a una elección auténtica, ofrecido
-                            mediante una decisión afirmativa y positiva, antes del tratamiento inicial, removible y
-                            documentado.</p>
+                        <p data-i18n="p1"></p>
+                        <p data-i18n="p2"></p>
+                        <p data-i18n="p3"></p>
+                        <p data-i18n="p4"></p>
                         <div ng-show="hasPersonalCookies == 'Sí'" class="">
-                            <h4>Cookies propias</h4>
+                            <h4 data-i18n="p5"></h4>
                             <p>Son aquellas cookies que son enviadas al ordenador o dispositivo del Usuario y
                                 gestionadas exclusivamente por <span class="blanc-space ng-binding">Sitio de venta de
                                     Produtcos Electrónicos</span> para el mejor funcionamiento del Sitio Web. La
@@ -120,5 +109,10 @@
     </div>
 
 
+    <script src="https://unpkg.com/jquery@latest/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/i18next@latest/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend@latest/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@latest/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="cookie-policy-script.js"></script>
 </body>
 </html>
