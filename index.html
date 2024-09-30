@@ -23,36 +23,39 @@
 
 <body class="inter">
 
-    </div>
+<header>
+    
+    <button id="switch-language" class="configuracion" data-i18n="idioma"></button>
+    <button id="cambiar-tema" class="configuracion"> </button>
+
+</header>
 
     <div class="cover-photo vertical">
         <div class="card opacity-50 height-50" id="titulo">
-            <h1>(IM)a(G)e Scrapper -- Version 0.5.0</h1>
+                <h1>(IM)a(G)e Scrapper -- Version 0.5.0</h1>
         </div>
 
-        <div id="cookie-banner" class="card vertical opacity-50 height-400 amarillo">
-            <p>
-                We use cookies to ensure you get the best experience on our website.
-            </p>
+        <div id="cookie-banner" class="card vertical opacity-50 height-100 amarillo">
+            <p data-i18n="cookies"></p>
             <div class="horizontal">
-                <button id="accept-cookies">Accept</button>
-                <button id="learn-more-cookies"> Learn More</button>
+                <button id="accept-cookies" data-i18n="cookies-accept"></button>
+                <button id="learn-more-cookies" data-i18n="cookies-learn"></button>
             </div>
         </div>
         <div class="horizontal">
             <form id="login" class="card vertical opacity-50 height-300">
-                <h1>Login</h1>
+                <h1 data-i18n="login"></h1>
                 <div class="horizontal">
                     <input type="text" class="input ancho-50" placeholder="Username" required>
                 </div>
                 <div class="horizontal">
                     <input type="password" class="input ancho-50" placeholder="Password" required>
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit" data-i18n="login"></button>
             </form>
 
             <form id="create_user" class="card vertical opacity-50 height-400">
-                <h1>Create User</h1>
+                <h1 data-i18n="create-user"></h1>
                 <div class="horizontal">
                     <input type="text" id="create_username" class="input ancho-50" placeholder="Username" required>
                 </div>
@@ -66,15 +69,18 @@
                     <input type="password" id="create_password2" class="input ancho-50" placeholder="Confirm Password"
                         required>
                 </div>
-                <button type="submit">Create User</button>
+                <button type="submit" data-i18n="create-user"></button>
                 <div id="mensajeError" style="color: red; visibility: hidden;"></div>
             </form>
 
         </div>
     </div>
 
-    <!-- Cookie Policy Banner -->
 
+    <script src="https://unpkg.com/jquery@latest/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/i18next@latest/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend@latest/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@latest/i18nextBrowserLanguageDetector.min.js"></script>
     <script src="login-page-script.js"></script>
 </body>
 
