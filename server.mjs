@@ -38,29 +38,32 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+
+
 // Endpoint for registration
 app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
+  console.log("data: " + { username, email, password })
 
   try {
     const [rows] = await pool.query(
       "SELECT * FROM usuarios WHERE usuario = ?",
-      [email]
+      [username]
     );
 
     if (rows.length > 0) {
-      return res.status(400).json({ message: "El usuario ya existe" });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     await pool.query(
-      "INSERT INTO usuarios (usuario, password, VALUES (?, ?)",
-      [email, password, new Date()]
+      "INSERT INTO scraper.usuarios VALUES (0, ?, ?, ?);",
+      [username, email, password]
     );
 
-    res.status(200).json({ message: "Registro exitoso" });
+    res.status(200).json({ message: "User Registration Successful" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error del servidor" });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
@@ -78,7 +81,7 @@ app.post("/login", async (req, res) => {
     console.log("Query result:", rows); 
 
     if (rows.length === 0) {
-      return res.status(400).json({ message: "El usuario no existe." });
+      return res.status(400).json({ message: "User does not exists." });
     }
 
     if (rows[0].password !== password) {
@@ -86,13 +89,15 @@ app.post("/login", async (req, res) => {
     }
     if (rows.length > 0) {
 
-      console.log("Usuario: " + rows[0].usuario)
+      console.log("Usuario: " + "/scraper.html?username=" + rows[0].usuario)
 
       res.status(200).json({
-        message: "Succesful login",
-        redirectTo: "/scraper.html?username=" + rows[0].usuario, // Pass username in URL
-      });
+        message: "Successful login",
+        username: rows[0].usuario,  
+        redirectTo: `/scraper.html?username=${encodeURIComponent(rows[0].usuario)}`,
+    });
     }
+
 
   } catch (error) {
     console.error("Database error:", error); // Log any database errors
@@ -123,11 +128,8 @@ function sanitizeFilename(filename) {
   return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
 
-// Function to get URL parameters
-function getQueryParameter(name) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(name);
-}
+
+
 
 app.post('/scrape', async (req, res) => {
   const { urls } = req.body;
@@ -231,43 +233,52 @@ app.post('/scrape', async (req, res) => {
       const archive = archiver('zip', { zlib: { level: 9 } });
 
       output.on('close', () => {
-          console.log(`ZIP file has been finalized and the output file descriptor has closed. Total bytes: ${archive.pointer()}`);
+        console.log(`ZIP file has been finalized. Total bytes: ${archive.pointer()}`);
 
-          fs.access(zipFilePath, fs.constants.F_OK, (err) => {
-              if (err) {
-                  console.error('ZIP file does not exist:', zipFilePath);
-                  res.status(404).json({ error: 'ZIP file not found' });
-              } else {
-                  res.download(zipFilePath, 'fotos.zip', (err) => {
-                      if (err) {
-                          console.error('Error sending file:', err);
-                          res.status(500).json({ error: 'Error sending file' });
-                      } else {
-                          fs.unlink(zipFilePath, (unlinkErr) => {
-                              if (unlinkErr) {
-                                  console.error('Error deleting ZIP file:', unlinkErr);
-                              }
-                          });
-                      }
-                  });
-              }
-          });
-      });
+        fs.access(zipFilePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                console.error('ZIP file does not exist:', zipFilePath);
+                return res.status(404).json({ error: 'ZIP file not found' });
+            } else {
+                res.download(zipFilePath, 'fotos.zip', (err) => {
+                    if (err) {
+                        console.error('Error sending file:', err);
+                        return res.status(500).json({ error: 'Error sending file' });
+                    } else {
+                        // Delete the downloaded images folder after sending the ZIP file
+                        fs.rm(downloadDir, { recursive: true, force: true }, (unlinkErr) => {
+                            if (unlinkErr) {
+                                console.error('Error deleting folder:', unlinkErr);
+                            } else {
+                                console.log(`Folder ${downloadDir} deleted successfully.`);
+                            }
+                        });
 
-      archive.on('error', (err) => {
-          throw err;
-      });
+                        // Also delete the ZIP file after sending
+                        fs.unlink(zipFilePath, (unlinkErr) => {
+                            if (unlinkErr) {
+                                console.error('Error deleting ZIP file:', unlinkErr);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
 
-      archive.pipe(output);
-      archive.directory(downloadDir, false);
-      archive.finalize();
+    archive.on('error', (err) => {
+        throw err;
+    });
 
-  } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Failed to scrape and download images' });
-  }
+    archive.pipe(output);
+    archive.directory(downloadDir, false);
+    archive.finalize();
+
+} catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to scrape and download images' });
+}
 });
-
 
 // Start the server
 app.listen(port, () => {

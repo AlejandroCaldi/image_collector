@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/images/Iscraper_ico.png" type="image/png">
+
+    <title data-i18n="cookies-tit"></title>
+
+</head>
+<body class="cardo-regular cover-photo">
+
+    <header>
+    
+        <button id="switch-language" class="configuracion" data-i18n="idioma"></button>
+        <button id="cambiar-tema" class="configuracion"> </button>
+    
+    </header>
+
+    <div id="cookieBanner" class="cookie-banner card height-1000 amarillo opacidad-50">
+        <div class="row">
+            <div>
+                <div>
+                    <div class="text-center">
+                        <h2 data-i18n="cookies-tit2"></h2>
+                        <h4><span>(Im)a(g)e Scrapper</span></h4>
+                    </hdiv>
+                    <div>
+                        <p data-i18n="p1"></p>
+                        <p data-i18n="p2"></p>
+                        <p data-i18n="p3"></p>
+                        <p data-i18n="p4"></p>
+                        <div ng-show="hasPersonalCookies == 'Sí'" class="">
+                            <h4 data-i18n="p5"></h4>
+                            <p>Son aquellas cookies que son enviadas al ordenador o dispositivo del Usuario y
+                                gestionadas exclusivamente por <span class="blanc-space ng-binding">Sitio de venta de
+                                    Produtcos Electrónicos</span> para el mejor funcionamiento del Sitio Web. La
+                                información que se recaba se emplea para mejorar la calidad del Sitio Web y su Contenido
+                                y su experiencia como Usuario. Estas cookies permiten reconocer al Usuario como
+                                visitante recurrente del Sitio Web y adaptar el contenido para ofrecerle contenidos que
+                                se ajusten a sus preferencias.</p>
+                        </div>
+                        <div class="thirdCookies" ng-show="hasThirdCookies == 'Sí'">
+                            <h4>Cookies de terceros</h4>
+                            <p>Son cookies utilizadas y gestionadas por entidades externas que proporcionan a <span
+                                    class="blanc-space ng-binding">Sitio de venta de Produtcos Electrónicos</span>
+                                servicios solicitados por este mismo para mejorar el Sitio Web y la experiencia del
+                                usuario al navegar en el Sitio Web. Los principales objetivos para los que se utilizan
+                                cookies de terceros son la obtención de estadísticas de accesos y analizar la
+                                información de la navegación, es decir, cómo interactúa el Usuario con el Sitio Web.</p>
+                            <p>La información que se obtiene se refiere, por ejemplo, al número de páginas visitadas, el
+                                idioma, el lugar a la que la dirección IP desde el que accede el Usuario, el número de
+                                Usuarios que acceden, la frecuencia y reincidencia de las visitas, el tiempo de visita,
+                                el navegador que usan, el operador o tipo de dispositivo desde el que se realiza la
+                                visita. Esta información se utiliza para mejorar el Sitio Web, y detectar nuevas
+                                necesidades para ofrecer a los Usuarios un Contenido y/o servicio de óptima calidad. En
+                                todo caso, la información se recopila de forma anónima y se elaboran informes de
+                                tendencias del Sitio Web sin identificar a usuarios individuales.</p>
+                            <p>Puede obtener más información sobre las cookies, la información sobre la privacidad, o
+                                consultar la descripción del tipo de cookies que se utiliza, sus principales
+                                características, periodo de expiración, etc. en el siguiente(s) enlace(s):</p>
+                            <pre><span class="blanc-space"><p class="text-wrap ng-binding"></p></span></pre>
+                            <p>La(s) entidad(es) encargada(s) del suministro de cookies podrá(n) ceder esta información
+                                a terceros, siempre y cuando lo exija la ley o sea un tercero el que procese esta
+                                información para dichas entidades.</p>
+                        </div>
+                        <div ng-show="hasSocial == 'Sí'" class="">
+                            <h4>Cookies de redes sociales</h4>
+                            <p><span class="blanc-space ng-binding">Sitio de venta de Produtcos Electrónicos</span>
+                                incorpora plugins de redes sociales, que permiten acceder a las mismas a partir del
+                                Sitio Web. Por esta razón, las cookies de redes sociales pueden almacenarse en el
+                                navegador del Usuario. Los titulares de dichas redes sociales disponen de sus propias
+                                políticas de protección de datos y de cookies, siendo ellos mismos, en cada caso,
+                                responsables de sus propios ficheros y de sus propias prácticas de privacidad. El
+                                Usuario debe referirse a las mismas para informarse acerca de dichas cookies y, en su
+                                caso, del tratamiento de sus datos personales. Únicamente a título informativo se
+                                indican a continuación los enlaces en los que se pueden consultar dichas políticas de
+                                privacidad y/o de cookies:</p>
+                            <ul>
+                                <li>Facebook: <a class="text-info"
+                                        href="https://www.facebook.com/policies/cookies/" target="_blank">https://www.facebook.com/policies/cookies/</a>
+                                </li>
+                                <li>Twitter: <a class="text-info"
+                                        href="https://twitter.com/es/privacy" target="_blank">https://twitter.com/es/privacy</a></li>
+                                <li>Instagram: <a class="text-info"
+                                        href="https://help.instagram.com/1896641480634370?ref=ig" target="_blank">https://help.instagram.com/1896641480634370?ref=ig</a>
+                                </li>
+                               
+                            </ul>
+                        </div>
+                        <h4>Deshabilitar, rechazar y eliminar cookies</h4>
+                        <p>El Usuario puede deshabilitar, rechazar y eliminar las cookies —total o parcialmente—
+                            instaladas en su dispositivo mediante la configuración de su navegador (entre los que se
+                            encuentran, por ejemplo, Chrome, Firefox, Safari, Explorer). En este sentido, los
+                            procedimientos para rechazar y eliminar las cookies pueden diferir de un navegador de
+                            Internet a otro. En consecuencia, el Usuario debe acudir a las instrucciones facilitadas por
+                            el propio navegador de Internet que esté utilizando. En el supuesto de que rechace el uso de
+                            cookies —total o parcialmente— podrá seguir usando el Sitio Web, si bien podrá tener
+                            limitada la utilización de algunas de las prestaciones del mismo.</p>
+                        <p>Este documento de Política de Cookies ha sido creado mediante el generador de <a
+                                class="text-body text-decoration-none"
+                                href="https://textos-legales.edgartamarit.com/" target="_blank">plantilla de política de cookies web
+                                gratis</a> online el día 10/09/2024.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://unpkg.com/jquery@latest/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/i18next@latest/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend@latest/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@latest/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="cookie-policy-script.js"></script>
+</body>
+</html>
