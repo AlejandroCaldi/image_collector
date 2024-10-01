@@ -83,6 +83,28 @@
     <script src="https://unpkg.com/i18next-http-backend@latest/i18nextHttpBackend.min.js"></script>
     <script src="https://unpkg.com/i18next-browser-languagedetector@latest/i18nextBrowserLanguageDetector.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitchCheckbox = document.querySelector('.theme-switch__checkbox');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+        
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeSwitchCheckbox.checked = true;
+            }
+        
+            themeSwitchCheckbox.addEventListener('change', () => {
+                if (themeSwitchCheckbox.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+        </script>
+        
 </body>
 
 </html>

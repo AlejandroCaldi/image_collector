@@ -54,7 +54,7 @@
 
     <div class="cover-photo vertical">
         <div class="card opacity-50 height-50" id="titulo">
-            <h1>(IM)a(G)e Scrapper -- Version 0.5.4</h1>
+            <h1>(IM)a(G)e Scrapper -- Version 0.6.0</h1>
         </div>
 
         <div id="cookie-banner" class="card vertical opacity-50 height-100 amarillo">
@@ -105,6 +105,28 @@
     <script
         src="https://unpkg.com/i18next-browser-languagedetector@latest/i18nextBrowserLanguageDetector.min.js"></script>
     <script src="login-page-script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitchCheckbox = document.querySelector('.theme-switch__checkbox');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+        
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeSwitchCheckbox.checked = true;
+            }
+        
+            themeSwitchCheckbox.addEventListener('change', () => {
+                if (themeSwitchCheckbox.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+        </script>
+        
 </body>
 
 </html>
