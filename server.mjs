@@ -7,24 +7,19 @@ import { fileURLToPath } from 'url';
 import axios from 'axios';
 import archiver from 'archiver';
 import bodyParser from 'body-parser';
-import mysql from 'mysql2/promise'; // Import mysql2 with promise support
+import { Pool } from 'pg'; // Import pg for PostgreSQL
 import cors from 'cors';
 
 // Initialize express app
 const app = express();
 const port = 443;
 
-
-// MySQL client setup
+// PostgreSQL client setup
 const dbConfig = {
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
+  connectionString: "postgres://postgres.fvwkjdlsmmrzhxswbgzn:kL4TqZrAhimOeMah@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require",
 };
 
-
-const pool = mysql.createPool(dbConfig);
+const pool = new Pool(dbConfig);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -39,16 +34,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-
-
 // Endpoint for registration
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
-  console.log("data: " + { username, email, password })
+  console.log("data: " + { username, email, password });
 
   try {
-    const [rows] = await pool.query(
-      "SELECT * FROM usuarios WHERE usuario = ?",
+    const { rows } = await pool.query(
+      "SELECT * FROM usuarios WHERE usuario = $1",
       [username]
     );
 
@@ -57,7 +50,7 @@ app.post("/register", async (req, res) => {
     }
 
     await pool.query(
-      "INSERT INTO scraper.usuarios VALUES (0, ?, ?, ?);",
+      "INSERT INTO usuarios (usuario, email, password) VALUES ($1, $2, $3);",
       [username, email, password]
     );
 
@@ -75,30 +68,27 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [rows] = await pool.query("SELECT usuario, password FROM scraper.usuarios WHERE usuario = ?", [
+    const { rows } = await pool.query("SELECT usuario, password FROM usuarios WHERE email = $1", [
       email,
     ]);
 
     console.log("Query result:", rows); 
 
     if (rows.length === 0) {
-      return res.status(400).json({ message: "User does not exists." });
+      return res.status(400).json({ message: "User does not exist." });
     }
 
     if (rows[0].password !== password) {
       return res.status(400).json({ message: "Password is incorrect" });
     }
-    if (rows.length > 0) {
 
-      console.log("Usuario: " + "/scraper.html?username=" + rows[0].usuario)
+    console.log("Usuario: " + "/scraper.html?username=" + rows[0].usuario);
 
-      res.status(200).json({
-        message: "Successful login",
-        username: rows[0].usuario,  
-        redirectTo: `/scraper.html?username=${encodeURIComponent(rows[0].usuario)}`,
+    res.status(200).json({
+      message: "Successful login",
+      username: rows[0].usuario,  
+      redirectTo: `/scraper.html?username=${encodeURIComponent(rows[0].usuario)}`,
     });
-    }
-
 
   } catch (error) {
     console.error("Database error:", error); // Log any database errors
@@ -106,10 +96,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+// Utility functions
 function replaceAfterChar(str, char) {
   const index = str.indexOf(char);
   if (index === -1) {
@@ -129,9 +116,7 @@ function sanitizeFilename(filename) {
   return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
 
-
-
-
+// Scrape endpoint
 app.post('/scrape', async (req, res) => {
   const { urls } = req.body;
 
@@ -200,13 +185,10 @@ app.post('/scrape', async (req, res) => {
               imageFileName = ensureJpgExtension(imageFileName);
               const imageFilePath = path.join(downloadDir, imageFileName);
 
-              //console.log(`Downloading ${imageUrl} to ${imageFilePath}`); // Debug line
-
               return new Promise((resolve, reject) => {
                   const writer = fs.createWriteStream(imageFilePath);
                   imageResponse.data.pipe(writer);
                   writer.on('finish', () => {
-                      //console.log(`Downloaded ${imageFilePath}`); // Debug line
                       resolve();
                   });
                   writer.on('error', reject);
@@ -223,8 +205,7 @@ app.post('/scrape', async (req, res) => {
           if (err) {
               console.error('Error reading download directory:', err);
           } else {
-              //console.log('Files in download directory:', files);
-              console.log("Todo bien hasta acá. Cantida de fotos bajadas: " + files.length)
+              console.log("Todo bien hasta acá. Cantida de fotos bajadas: " + files.length);
           }
       });
 
@@ -265,20 +246,20 @@ app.post('/scrape', async (req, res) => {
                 });
             }
         });
-    });
+      });
 
-    archive.on('error', (err) => {
+      archive.on('error', (err) => {
         throw err;
-    });
+      });
 
-    archive.pipe(output);
-    archive.directory(downloadDir, false);
-    archive.finalize();
+      archive.pipe(output);
+      archive.directory(downloadDir, false);
+      archive.finalize();
 
-} catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to scrape and download images' });
-}
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Failed to scrape and download images' });
+  }
 });
 
 // Start the server
