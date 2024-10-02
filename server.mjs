@@ -17,11 +17,12 @@ const port = 443;
 
 // MySQL client setup
 const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Amallas12.",
-  database: "scraper"
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
 };
+
 
 const pool = mysql.createPool(dbConfig);
 const __filename = fileURLToPath(import.meta.url);
