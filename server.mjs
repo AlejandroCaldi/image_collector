@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 import axios from 'axios';
 import archiver from 'archiver';
 import bodyParser from 'body-parser';
-import { Pool } from 'pg'; // Use pg for PostgreSQL
+import pkg from 'pg'; 
+const { Pool } = pkg;
 import cors from 'cors';
 
 // Initialize express app
@@ -36,62 +37,61 @@ app.get('/', (req, res) => {
 
 // Endpoint for registration
 app.post("/register", async (req, res) => {
-    const { username, email, password } = req.body;
-    console.log("data: " + { username, email, password });
+  const { username, email, password } = req.body;
+  console.log("Register data:", req.body);
 
-    try {
-        const { rows } = await pool.query(
-            "SELECT * FROM usuarios WHERE usuario = $1",
-            [username]
-        );
+  try {
+      const { rows } = await pool.query(
+          "SELECT * FROM usuarios WHERE usuario = $1",
+          [username]
+      );
 
-        if (rows.length > 0) {
-            return res.status(400).json({ message: "User already exists" });
-        }
+      console.log("User query result:", rows);
 
-        await pool.query(
-            "INSERT INTO usuarios (usuario, email, password) VALUES ($1, $2, $3)",
-            [username, email, password]
-        );
+      if (rows.length > 0) {
+          return res.status(400).json({ message: "User already exists" });
+      }
 
-        res.status(200).json({ message: "User Registration Successful" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
-    }
+      await pool.query(
+          "INSERT INTO usuarios (usuario, email, password) VALUES ($1, $2, $3)",
+          [username, email, password]
+      );
+
+      res.status(200).json({ message: "User Registration Successful" });
+  } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Server Error" });
+  }
 });
 
 // Endpoint for login
 app.post("/login", async (req, res) => {
-    console.log("Login attempt:", req.body); // Log the incoming request body
+  const { email, password } = req.body;
+  console.log("Login attempt:", req.body);
 
-    const { email, password } = req.body;
+  try {
+      const { rows } = await pool.query("SELECT usuario, password FROM usuarios WHERE usuario = $1", [email]);
 
-    try {
-        const { rows } = await pool.query("SELECT usuario, password FROM usuarios WHERE email = $1", [email]);
+      console.log("Query result:", rows);
 
-        console.log("Query result:", rows);
+      if (rows.length === 0) {
+          return res.status(400).json({ message: "User does not exist." });
+      }
 
-        if (rows.length === 0) {
-            return res.status(400).json({ message: "User does not exist." });
-        }
+      if (rows[0].password !== password) {
+          return res.status(400).json({ message: "Password is incorrect" });
+      }
 
-        if (rows[0].password !== password) {
-            return res.status(400).json({ message: "Password is incorrect" });
-        }
+      res.status(200).json({
+          message: "Successful login",
+          username: rows[0].usuario,
+          redirectTo: `/scraper.html?username=${encodeURIComponent(rows[0].usuario)}`,
+      });
 
-        console.log("Usuario: " + "/scraper.html?username=" + rows[0].usuario);
-
-        res.status(200).json({
-            message: "Successful login",
-            username: rows[0].usuario,
-            redirectTo: `/scraper.html?username=${encodeURIComponent(rows[0].usuario)}`,
-        });
-
-    } catch (error) {
-        console.error("Database error:", error); // Log any database errors
-        res.status(500).json({ message: "Server error" });
-    }
+  } catch (error) {
+      console.error("Database error:", error);
+      res.status(500).json({ message: "Server error" });
+  }
 });
 
 // Function to replace a character in a string
