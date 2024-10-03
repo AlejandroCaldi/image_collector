@@ -99,7 +99,7 @@ button:active {
   width: 95%;
   height: 500px;
   border-radius: 30px;
-  background: lightgrey;
+  background: var(--color-background-card); 
   box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset;
 }
 
@@ -314,7 +314,7 @@ header{
   padding-top: 10px;
   width: 97%;
   height: 20px;
-  background: lightgrey;
+  background: var(--color-background-card); /*... */
   box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset;
 }
 
@@ -539,15 +539,17 @@ header{
   --background-button-color: #23c483;
   --background-amarillo-color:  rgb(227, 227, 97);
   --color-amarillo--font:  #000;
+  --color-background-card: lightgrey;
 }
 
 [data-theme="dark"] {
   --background-color: #2e2e2e;
-  --text-color: #534f4f;
+  --text-color: #d8d3d3;
   --background-img: url("/images/Iscraper_dark.jpg"); 
   --background-button-color: #272c2a;
   --background-amarillo-color:  rgb(95, 132, 166);
   --color-amarillo--font:  #e7ec78;
+  --color-background-card: rgb(112, 105, 105);
 }
 
 body {
