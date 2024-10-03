@@ -50,9 +50,8 @@ body {
   border: none;
   padding: 1rem;
   border-radius: 1rem;
-  background: #e8e8e8;
-  box-shadow: 10px 10px 30px #c5c5c5,
-    -10px -10px 30px #ffffff;
+  background: var(--background-input);
+  box-shadow: var(--box-shadow-input);
   transition: 0.3s;
 }
 
@@ -314,7 +313,7 @@ header{
   padding-top: 10px;
   width: 97%;
   height: 20px;
-  background: var(--color-background-card); /*... */
+  background: var(--color-background-card);
   box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset;
 }
 
@@ -325,7 +324,6 @@ header{
   margin-right: 5px;
 }
 
-/* From Uiverse.io by Galahhad */ 
 .theme-switch {
   --toggle-size: 10px;
   /* the size is adjusted using font-size,
@@ -334,7 +332,6 @@ header{
   --container-width: 5.625em;
   --container-height: 2.5em;
   --container-radius: 6.25em;
-  /* radius 0 - minecraft mode :) */
   --container-light-bg: #3D7EAE;
   --container-night-bg: #1D1F2C;
   --circle-container-diameter: 3.375em;
@@ -540,6 +537,9 @@ header{
   --background-amarillo-color:  rgb(227, 227, 97);
   --color-amarillo--font:  #000;
   --color-background-card: lightgrey;
+  --background-input: #e8e8e8;
+  --box-shadow-input: 10px 10px 30px #c5c5c5,
+    -10px -10px 30px #ffffff;
 }
 
 [data-theme="dark"] {
@@ -550,6 +550,9 @@ header{
   --background-amarillo-color:  rgb(95, 132, 166);
   --color-amarillo--font:  #e7ec78;
   --color-background-card: rgb(112, 105, 105);
+  --background-input: #434040;
+  --box-shadow-input: 10px 10px 30px #4a4646,
+    -10px -10px 30px #7a7777;
 }
 
 body {
