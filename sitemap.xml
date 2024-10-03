@@ -3,19 +3,34 @@
   
   <!-- Home Page -->
   <url>
-    <loc>http://www.image-collector.000.pe/</loc>
-    <lastmod>2024-09-19</lastmod>
+    <loc>https://image-collector-2.vercel.app/</loc>
+    <lastmod>2024-10-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <!-- Public Directory Index -->
   <url>
-    <loc>http://www.image-collector.000.pe/public/index.html</loc>
-    <lastmod>2024-09-19</lastmod>
+    <loc>http://image-collector-2.vercel.app/index.html</loc>
+    <lastmod>2024-10-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
+    <url>
+    <loc>http://image-collector-2.vercel.app/public/scraper.html</loc>
+    <lastmod>2024-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+
+    <url>
+    <loc>http://image-collector-2.vercel.app/public/cookie-policy.html</loc>
+    <lastmod>2024-10-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+
+  </url>
 
 </urlset>
+
+

@@ -35,7 +35,7 @@ $('#switch-language').on('click', function () {
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username'); // Ensure this line exists
+    const username = urlParams.get('username'); 
   
     if (!username) {
       alert('Username is missing from the URL parameters.');
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cubito = document.getElementById('cubito');
       cubito.style.visibility = 'visible';
       try {
-        const response = await fetch(`/scrape?username=${encodeURIComponent(username)}`, { // Add username to the fetch request URL
+        const response = await fetch(`/scrape?username=${encodeURIComponent(username)}`, { 
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'images.zip'; // Adjust the filename as needed
+        a.download = 'images.zip'; 
         document.body.appendChild(a);
         a.click();
         a.remove();
