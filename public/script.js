@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
   
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Network response was not ok: ' + response);
         }
   
         const blob = await response.blob();
